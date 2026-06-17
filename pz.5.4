@@ -1,0 +1,124 @@
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+namespace WindowsFormsApp
+{
+    public class MainForm : Form
+    {
+        // Компоненти з попередніх завдань
+        private ToolStrip toolStrip1;
+        private RichTextBox richTextBox1;
+        private StatusStrip statusStrip1;
+        private ToolStripStatusLabel StatusLabel1;
+        private ToolStripStatusLabel StatusLabel2;
+        private Timer timer1;
+
+        // Нові компоненти для Головного Меню
+        private MenuStrip menuStrip1;
+        private ToolStripMenuItem menuView;
+        private ToolStripMenuItem menuToggleToolStrip;
+        private ToolStripMenuItem menuToggleStatusStrip;
+
+        public MainForm()
+        {
+            // Налаштування форми
+            this.Text = "Текстовий редактор з головним меню";
+            this.Size = new Size(650, 450);
+            this.StartPosition = FormStartPosition.CenterScreen;
+
+            // 2. Реєстрація події Load для форми
+            this.Load += new EventHandler(MainForm_Load);
+
+            // Ініціалізація RichTextBox
+            richTextBox1 = new RichTextBox();
+            richTextBox1.Dock = DockStyle.Fill;
+            richTextBox1.Font = new Font("Arial", 12f);
+
+            // Ініціалізація ToolStrip та кнопок
+            toolStrip1 = new ToolStrip();
+            ToolStripButton btnNew = new ToolStripButton("Створити");
+            ToolStripButton btnCut = new ToolStripButton("Вирізати");
+            ToolStripButton btnCopy = new ToolStripButton("Копіювати");
+            ToolStripButton btnPaste = new ToolStripButton("Вставити");
+            toolStrip1.Items.AddRange(new ToolStripItem[] { btnNew, new ToolStripSeparator(), btnCut, btnCopy, btnPaste });
+
+            // Ініціалізація рядка стану та таймера
+            statusStrip1 = new StatusStrip();
+            StatusLabel1 = new ToolStripStatusLabel("Готово") { Spring = true, TextAlign = ContentAlignment.MiddleLeft };
+            StatusLabel2 = new ToolStripStatusLabel { TextAlign = ContentAlignment.MiddleRight };
+            statusStrip1.Items.AddRange(new ToolStripItem[] { StatusLabel1, StatusLabel2 });
+
+            timer1 = new Timer { Interval = 1000, Enabled = true };
+            timer1.Tick += (s, e) => StatusLabel2.Text = DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss");
+
+            // ==========================================================
+            // 1. СТВОРЕННЯ ГОЛОВНОГО МЕНЮ (MenuStrip)
+            // ==========================================================
+            menuStrip1 = new MenuStrip();
+
+            // Створюємо основний розділ "Вигляд"
+            menuView = new ToolStripMenuItem("Вигляд");
+
+            // Створюємо підпункти меню
+            menuToggleToolStrip = new ToolStripMenuItem("Панель інструментів");
+            menuToggleStatusStrip = new ToolStripMenuItem("Рядок стану");
+
+            // 3. Задаємо властивість CheckOnClick (пункт працює як прапорець)
+            menuToggleToolStrip.CheckOnClick = true;
+            menuToggleStatusStrip.CheckOnClick = true;
+
+            // 4. Реєструємо обробники подій CheckedChanged
+            menuToggleToolStrip.CheckedChanged += new EventHandler(MenuToggleToolStrip_CheckedChanged);
+            menuToggleStatusStrip.CheckedChanged += new EventHandler(MenuToggleStatusStrip_CheckedChanged);
+
+            // Додаємо підпункти до меню "Вигляд"
+            menuView.DropDownItems.Add(menuToggleToolStrip);
+            menuView.DropDownItems.Add(menuToggleStatusStrip);
+
+            // Додаємо "Вигляд" до головного меню
+            menuStrip1.Items.Add(menuView);
+            // ==========================================================
+
+            // Додавання елементів на форму (порядок важливий для правильного Docking)
+            this.Controls.Add(richTextBox1);
+            this.Controls.Add(toolStrip1);
+            this.Controls.Add(statusStrip1);
+            this.Controls.Add(menuStrip1); // Меню додається останнім, щоб бути на самому верху
+        }
+
+        // 2. Обробник події Load для форми
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+            // Оскільки при запуску програми панелі за замовчуванням видимі (Visible = true),
+            // ми встановлюємо прапорці в меню у стан "ввімкнено" (true).
+            menuToggleToolStrip.Checked = toolStrip1.Visible;
+            menuToggleStatusStrip.Checked = statusStrip1.Visible;
+        }
+
+        // 4-5. Обробник для Панелі інструментів
+        private void MenuToggleToolStrip_CheckedChanged(object sender, EventArgs e)
+        {
+            // Використовуємо оператор логічного заперечення (!) для інверсії стану
+            toolStrip1.Visible = !toolStrip1.Visible;
+        }
+
+        // 4-5. Обробник для Рядка стану
+        private void MenuToggleStatusStrip_CheckedChanged(object sender, EventArgs e)
+        {
+            // Інвертуємо видимість рядка стану
+            statusStrip1.Visible = !statusStrip1.Visible;
+        }
+    }
+
+    public static class Program
+    {
+        [STAThread]
+        public static void Main()
+        {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new MainForm());
+        }
+    }
+}
