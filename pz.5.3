@@ -1,0 +1,122 @@
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+namespace WindowsFormsApp
+{
+    public class MainForm : Form
+    {
+        private ToolStrip toolStrip1;
+        private RichTextBox richTextBox1;
+        private StatusStrip statusStrip1;
+        private ToolStripStatusLabel StatusLabel1;
+        private ToolStripStatusLabel StatusLabel2;
+        private Timer timer1;
+
+        public MainForm()
+        {
+            // Налаштування форми
+            this.Text = "Текстовий редактор з рядком стану";
+            this.Size = new Size(650, 450);
+            this.StartPosition = FormStartPosition.CenterScreen;
+
+            // Ініціалізація RichTextBox
+            richTextBox1 = new RichTextBox();
+            richTextBox1.Dock = DockStyle.Fill;
+            richTextBox1.Font = new Font("Arial", 12f);
+
+            // Ініціалізація ToolStrip
+            toolStrip1 = new ToolStrip();
+            toolStrip1.ShowItemToolTips = true;
+
+            // Створення кнопок для ToolStrip
+            ToolStripButton btnNew = new ToolStripButton("Створити");
+            ToolStripButton btnCut = new ToolStripButton("Вирізати");
+            ToolStripButton btnCopy = new ToolStripButton("Копіювати");
+            ToolStripButton btnPaste = new ToolStripButton("Вставити");
+
+            // Завдання 1.3: Спливаючі підказки (ToolTipText)
+            btnNew.ToolTipText = "Очистити поле та створити новий документ";
+            btnCut.ToolTipText = "Вирізати виділений текст у буфер";
+            btnCopy.ToolTipText = "Копіювати виділений текст у буфер";
+            btnPaste.ToolTipText = "Вставити текст із буфера обміну";
+
+            // Обробники кліків для кнопок
+            btnNew.Click += (s, e) => richTextBox1.Clear();
+            btnCut.Click += (s, e) => richTextBox1.Cut();
+            btnCopy.Click += (s, e) => richTextBox1.Copy();
+            btnPaste.Click += (s, e) => richTextBox1.Paste();
+
+            // 1. Додавання рядка стану (StatusStrip)
+            statusStrip1 = new StatusStrip();
+
+            // 2. Додавання об’єкта StatusLabel1
+            StatusLabel1 = new ToolStripStatusLabel("Готово");
+            StatusLabel1.Spring = true; // Дозволяє розтягуватися, зміщуючи дату вправо
+            StatusLabel1.TextAlign = ContentAlignment.MiddleLeft;
+
+            // 4.1. Додавання StatusLabel2 для поточної дати
+            StatusLabel2 = new ToolStripStatusLabel();
+            StatusLabel2.TextAlign = ContentAlignment.MiddleRight;
+
+            // Додаємо мітки до рядка стану
+            statusStrip1.Items.Add(StatusLabel1);
+            statusStrip1.Items.Add(StatusLabel2);
+
+            // 3. Виведення підказок для кнопок у рядок стану (динамічно при наведенні)
+            btnNew.MouseEnter += (s, e) => StatusLabel1.Text = "Команда: Створити новий документ";
+            btnNew.MouseLeave += (s, e) => StatusLabel1.Text = "Готово";
+
+            btnCut.MouseEnter += (s, e) => StatusLabel1.Text = "Команда: Вирізати виділений текст";
+            btnCut.MouseLeave += (s, e) => StatusLabel1.Text = "Готово";
+
+            btnCopy.MouseEnter += (s, e) => StatusLabel1.Text = "Команда: Копіювати текст у буфер";
+            btnCopy.MouseLeave += (s, e) => StatusLabel1.Text = "Готово";
+
+            btnPaste.MouseEnter += (s, e) => StatusLabel1.Text = "Команда: Вставити текст із буфера";
+            btnPaste.MouseLeave += (s, e) => StatusLabel1.Text = "Готово";
+
+            // 4.2-4.3. Налаштування елемента керування Timer
+            timer1 = new Timer();
+            timer1.Interval = 1000; // Інтервал 1000 мс (1 секунда)
+            timer1.Enabled = true;  // Вмикаємо таймер (Enable = true)
+            
+            // 4.4. Створення обробника подій Tick
+            timer1.Tick += Timer1_Tick;
+
+            // Початкове відображення часу відразу при запуску програми
+            UpdateDateTime();
+
+            // Складання панелі інструментів
+            toolStrip1.Items.AddRange(new ToolStripItem[] { btnNew, new ToolStripSeparator(), btnCut, btnCopy, btnPaste });
+
+            // Додавання елементів на форму (порядок важливий для коректного Docking)
+            this.Controls.Add(richTextBox1);
+            this.Controls.Add(toolStrip1);
+            this.Controls.Add(statusStrip1);
+        }
+
+        // 4.4. Метод обробника події Tick таймера
+        private void Timer1_Tick(object sender, EventArgs e)
+        {
+            UpdateDateTime();
+        }
+
+        // Допоміжний метод для виведення поточної дати та часу
+        private void UpdateDateTime()
+        {
+            StatusLabel2.Text = DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss");
+        }
+    }
+
+    public static class Program
+    {
+        [STAThread]
+        public static void Main()
+        {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new MainForm());
+        }
+    }
+}
