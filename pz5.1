@@ -1,0 +1,68 @@
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+namespace WindowsFormsApp
+{
+    // Головний клас форми
+    public class MainForm : Form
+    {
+        private ToolStrip toolStrip1;
+        private RichTextBox richTextBox1;
+
+        public MainForm()
+        {
+            // 1. Налаштування самої форми
+            this.Text = "Текстовий редактор (Завдання 1)";
+            this.Size = new Size(600, 400);
+            this.StartPosition = FormStartPosition.CenterScreen;
+
+            // 2. Ініціалізація та налаштування RichTextBox
+            richTextBox1 = new RichTextBox();
+            richTextBox1.Dock = DockStyle.Fill; // Заповнює весь вільний простір
+            richTextBox1.Font = new Font("Arial", 12f);
+            richTextBox1.Name = "richTextBox1";
+
+            // 3. Ініціалізація ToolStrip
+            toolStrip1 = new ToolStrip();
+            toolStrip1.Name = "toolStrip1";
+
+            // 4. Створення "стандартних" кнопок для ToolStrip
+            ToolStripButton btnNew = new ToolStripButton("Створити");
+            ToolStripButton btnCut = new ToolStripButton("Вирізати");
+            ToolStripButton btnCopy = new ToolStripButton("Копіювати");
+            ToolStripButton btnPaste = new ToolStripButton("Вставити");
+
+            // 5. Додавання обробників подій (логіки) для кнопок
+            btnNew.Click += (sender, e) => richTextBox1.Clear();
+            btnCut.Click += (sender, e) => richTextBox1.Cut();
+            btnCopy.Click += (sender, e) => richTextBox1.Copy();
+            btnPaste.Click += (sender, e) => richTextBox1.Paste();
+
+            // 6. Додавання кнопок на панель інструментів
+            toolStrip1.Items.Add(btnNew);
+            toolStrip1.Items.Add(new ToolStripSeparator()); // Розділювач
+            toolStrip1.Items.Add(btnCut);
+            toolStrip1.Items.Add(btnCopy);
+            toolStrip1.Items.Add(btnPaste);
+
+            // 7. Додавання елементів на форму 
+            // Важливо: RichTextBox додаємо першим, щоб ToolStrip коректно закріпився зверху
+            this.Controls.Add(richTextBox1);
+            this.Controls.Add(toolStrip1);
+        }
+    }
+
+    // Точка входу в програму
+    public static class Program
+    {
+        [STAThread]
+        public static void Main()
+        {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            // Запуск нашої форми
+            Application.Run(new MainForm());
+        }
+    }
+}
